@@ -13,30 +13,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  InterstitialAd? _interstitialAd;
-  bool _isInterstitialAdReady = false;
+  late RewardedAd _rewardedAd;
+  bool _isRewardedAdReady = false;
 
   int _counter = 0;
 
-  void _loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: AdHelper.interstitialAdUnitId,
+  void _loadRewardedAd() {
+    debugPrint("loading..,, rewarded ad");
+    RewardedAd.load(
+      adUnitId: AdHelper.rewardedAdUnitId,
       request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
-          _interstitialAd = ad;
+          _rewardedAd = ad;
 
           ad.fullScreenContentCallback = FullScreenContentCallback(
             onAdDismissedFullScreenContent: (ad) {
-              debugPrint("Dismiussed full screen ad !");
+              debugPrint("full screen dismissed...");
+              setState(() {
+                _isRewardedAdReady = false;
+              });
+              _loadRewardedAd();
             },
           );
 
-          _isInterstitialAdReady = true;
+          setState(() {
+            _isRewardedAdReady = true;
+          });
         },
         onAdFailedToLoad: (err) {
-          debugPrint('Failed to load an interstitial ad: ${err.message}');
-          _isInterstitialAdReady = false;
+          debugPrint('Failed to load a rewarded ad: ${err.message}');
+          setState(() {
+            _isRewardedAdReady = false;
+          });
         },
       ),
     );
@@ -44,13 +53,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    _loadInterstitialAd();
+    // _loadRewardedAd();
     super.initState();
   }
 
   @override
   void dispose() {
-    _interstitialAd?.dispose();
+    _rewardedAd.dispose();
     super.dispose();
   }
 
@@ -58,8 +67,41 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _counter++;
     });
-    if (_counter >= 4 && _isInterstitialAdReady) {
-      _interstitialAd?.show();
+
+    if (_counter % 2 == 0) {
+      _loadRewardedAd();
+    }
+
+    if (_isRewardedAdReady && _counter % 3 == 0) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Need a hint?'),
+            content: const Text('Watch an Ad to get a hint!'),
+            actions: [
+              TextButton(
+                child: Text('cancel'.toUpperCase()),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              TextButton(
+                child: Text('ok'.toUpperCase()),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _rewardedAd.show(
+                    onUserEarnedReward: (RewardedAd ad, RewardItem reward) {
+                      debugPrint("reward earned !!");
+                      // _loadRewardedAd();
+                    },
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -73,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('At 4, You\'ll see the interstitial ad.'),
+            const Text('At multiple of 3, You\'ll ask for ad.[if loaded]'),
             const SizedBox(height: 20.0),
             Text(
               '$_counter',
