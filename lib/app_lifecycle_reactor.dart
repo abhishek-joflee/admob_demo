@@ -1,0 +1,19 @@
+import 'package:admob_demo/app_open_ad_manager.dart';
+import 'package:flutter/material.dart';
+
+class AppLifecycleReactor extends WidgetsBindingObserver {
+  final AppOpenAdManager appOpenAdManager;
+
+  AppLifecycleReactor({required this.appOpenAdManager});
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    // Try to show an app open ad if the app is being resumed and
+    // we're not already showing an app open ad.
+    debugPrint("myLog::: state $state");
+    if (state == AppLifecycleState.resumed) {
+      debugPrint("myLog::: state changed $state calling showAdIfAvailable...");
+      appOpenAdManager.showAdIfAvailable();
+    }
+  }
+}
