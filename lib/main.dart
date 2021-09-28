@@ -5,6 +5,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'homepage_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   runApp(const MyApp());
 }
 

@@ -10,6 +10,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    // Load ads.
+  }
+
   int _counter = 0;
 
   void _incrementCounter() {
