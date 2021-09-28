@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -10,13 +13,46 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  @override
-  void initState() {
-    super.initState();
-    // Load ads.
+  BannerAd? _standardBanner;
+  int _counter = 0;
+
+  _createStandardBanner() {
+    final BannerAd myBanner = BannerAd(
+      adUnitId: Platform.isAndroid
+          ? 'ca-app-pub-3940256099942544/6300978111'
+          : 'ca-app-pub-3940256099942544/2934735716',
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (Ad ad) {
+          debugPrint('Ad loaded.');
+          setState(() {
+            _standardBanner = ad as BannerAd?;
+          });
+        },
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          ad.dispose();
+          debugPrint('Ad failed to load: $error');
+        },
+        onAdOpened: (Ad ad) => debugPrint('Ad opened.'),
+        onAdClosed: (Ad ad) => debugPrint('Ad closed.'),
+        onAdImpression: (Ad ad) => debugPrint('Ad impression.'),
+      ),
+    );
+    myBanner.load();
   }
 
-  int _counter = 0;
+  @override
+  void initState() {
+    _createStandardBanner();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _standardBanner?.dispose();
+    super.dispose();
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -26,6 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    _createStandardBanner();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -34,6 +71,13 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            if (_standardBanner != null)
+              Container(
+                color: Colors.green,
+                width: _standardBanner!.size.width.toDouble(),
+                height: _standardBanner!.size.height.toDouble(),
+                child: AdWidget(ad: _standardBanner!),
+              ),
             const Text(
               'You have pushed the button this many times:',
             ),
