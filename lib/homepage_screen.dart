@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -15,46 +13,53 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  BannerAd? _standardBanner;
+  InterstitialAd? _interstitialAd;
+  bool _isInterstitialAdReady = false;
+
   int _counter = 0;
 
-  _createStandardBanner() {
-    final BannerAd myBanner = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      size: AdSize.banner,
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
       request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          debugPrint('Ad loaded.');
-          setState(() {
-            _standardBanner = ad as BannerAd?;
-          });
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              debugPrint("Dismiussed full screen ad !");
+            },
+          );
+
+          _isInterstitialAdReady = true;
         },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          ad.dispose();
-          debugPrint('Ad failed to load: $error');
+        onAdFailedToLoad: (err) {
+          debugPrint('Failed to load an interstitial ad: ${err.message}');
+          _isInterstitialAdReady = false;
         },
-        onAdOpened: (Ad ad) => debugPrint('Ad opened.'),
-        onAdClosed: (Ad ad) => debugPrint('Ad closed.'),
-        onAdImpression: (Ad ad) => debugPrint('Ad impression.'),
       ),
     );
-    myBanner.load();
   }
 
   @override
   void initState() {
-    _createStandardBanner();
     super.initState();
   }
 
   @override
   void dispose() {
-    _standardBanner?.dispose();
+    _interstitialAd?.dispose();
     super.dispose();
   }
 
   void _incrementCounter() {
+    if (_counter >= 3 && !_isInterstitialAdReady) {
+      _loadInterstitialAd();
+    }
+    if (_isInterstitialAdReady) {
+      _interstitialAd?.show();
+    }
     setState(() {
       _counter++;
     });
@@ -62,7 +67,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    _createStandardBanner();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -71,13 +75,6 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            if (_standardBanner != null)
-              Container(
-                color: Colors.green,
-                width: _standardBanner!.size.width.toDouble(),
-                height: _standardBanner!.size.height.toDouble(),
-                child: AdWidget(ad: _standardBanner!),
-              ),
             const Text(
               'You have pushed the button this many times:',
             ),
