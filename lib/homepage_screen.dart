@@ -54,15 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
     if (_counter >= 3 && !_isInterstitialAdReady) {
       _loadInterstitialAd();
     }
     if (_isInterstitialAdReady) {
       _interstitialAd?.show();
     }
-    setState(() {
-      _counter++;
-    });
   }
 
   @override
@@ -76,8 +76,9 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'After 3, at any time, You\'ll see the interstitial ad.',
             ),
+            const SizedBox(height: 20.0),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
