@@ -44,6 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    _loadInterstitialAd();
     super.initState();
   }
 
@@ -57,10 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _counter++;
     });
-    if (_counter >= 3 && !_isInterstitialAdReady) {
-      _loadInterstitialAd();
-    }
-    if (_isInterstitialAdReady) {
+    if (_counter >= 4 && _isInterstitialAdReady) {
       _interstitialAd?.show();
     }
   }
@@ -75,9 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'After 3, at any time, You\'ll see the interstitial ad.',
-            ),
+            const Text('At 4, You\'ll see the interstitial ad.'),
             const SizedBox(height: 20.0),
             Text(
               '$_counter',
