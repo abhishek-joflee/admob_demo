@@ -2,14 +2,26 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 //? my-imports
-import 'app_open_ad_manager.dart';
+import 'ad_helper.dart';
 import 'homepage_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await MobileAds.instance.initialize();
-  AppOpenAdManager appOpenAdManager = AppOpenAdManager();
-  appOpenAdManager.showAdIfAvailable();
+  await AppOpenAd.load(
+    adUnitId: AdHelper.openAppAdUnitId,
+    orientation: AppOpenAd.orientationPortrait,
+    request: const AdRequest(),
+    adLoadCallback: AppOpenAdLoadCallback(
+      onAdLoaded: (ad) async {
+        await ad.show();
+      },
+      onAdFailedToLoad: (error) {
+        debugPrint('AppOpenAd failed to load: $error');
+        // Handle the error.
+      },
+    ),
+  );
   runApp(const MyApp());
 }
 

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'app_lifecycle_reactor.dart';
-import 'app_open_ad_manager.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -15,9 +13,6 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   @override
   void initState() {
-    AppOpenAdManager appOpenAdManager = AppOpenAdManager()..loadAd();
-    WidgetsBinding.instance!
-        .addObserver(AppLifecycleReactor(appOpenAdManager: appOpenAdManager));
     super.initState();
   }
 
