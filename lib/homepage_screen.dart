@@ -25,11 +25,20 @@ class _MyHomePageState extends State<MyHomePage> {
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
           _interstitialAd = ad;
-
           ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              debugPrint("Dismiussed full screen ad !");
+            onAdShowedFullScreenContent: (InterstitialAd ad) =>
+                debugPrint('$ad onAdShowedFullScreenContent.'),
+            onAdDismissedFullScreenContent: (InterstitialAd ad) {
+              debugPrint('$ad onAdDismissedFullScreenContent.');
+              ad.dispose();
             },
+            onAdFailedToShowFullScreenContent:
+                (InterstitialAd ad, AdError error) {
+              debugPrint('$ad onAdFailedToShowFullScreenContent: $error');
+              ad.dispose();
+            },
+            onAdImpression: (InterstitialAd ad) =>
+                debugPrint('$ad impression occurred.'),
           );
 
           _isInterstitialAdReady = true;
