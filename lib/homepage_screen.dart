@@ -13,12 +13,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late NativeAd _nativeAd;
-  bool _isAdLoaded = false;
+  NativeAd? _nativeAd;
+  // bool _isAdLoaded = false;
   int _counter = 0;
 
   _createNativeAD() {
-    _nativeAd = NativeAd(
+    var _ad = NativeAd(
       adUnitId: AdHelper.nativeAdUnitId,
       factoryId: 'listTile',
       request: const AdRequest(),
@@ -26,7 +26,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onAdLoaded: (ad) {
           setState(() {
             debugPrint("setState is being called...");
-            _isAdLoaded = true;
+            _nativeAd = ad as NativeAd;
           });
         },
         onAdFailedToLoad: (ad, error) {
@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
     );
-    _nativeAd.load();
+    _ad.load();
   }
 
   @override
@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    _nativeAd.dispose();
+    _nativeAd!.dispose();
     super.dispose();
   }
 
@@ -59,6 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // _createNativeAD();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -67,17 +68,17 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _isAdLoaded
+            _nativeAd == null
                 ? Container(
                     height: 100.0,
                     width: double.infinity,
-                    alignment: Alignment.center,
-                    child: AdWidget(ad: _nativeAd),
+                    color: Colors.green,
                   )
                 : Container(
                     height: 100.0,
                     width: double.infinity,
-                    color: Colors.green,
+                    alignment: Alignment.center,
+                    child: AdWidget(ad: _nativeAd!),
                   ),
             const Text(
               'You have pushed the button this many times:',
