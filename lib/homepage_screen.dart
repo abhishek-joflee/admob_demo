@@ -28,13 +28,18 @@ class _MyHomePageState extends State<MyHomePage> {
           _rewardedAd = ad;
 
           ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              debugPrint("full screen dismissed...");
-              setState(() {
-                _isRewardedAdReady = false;
-              });
-              _loadRewardedAd();
+            onAdShowedFullScreenContent: (RewardedAd ad) =>
+                debugPrint('$ad onAdShowedFullScreenContent.'),
+            onAdDismissedFullScreenContent: (RewardedAd ad) {
+              debugPrint('$ad onAdDismissedFullScreenContent.');
+              ad.dispose();
             },
+            onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
+              debugPrint('$ad onAdFailedToShowFullScreenContent: $error');
+              ad.dispose();
+            },
+            onAdImpression: (RewardedAd ad) =>
+                debugPrint('$ad impression occurred.'),
           );
 
           setState(() {
@@ -53,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    // _loadRewardedAd();
+    _loadRewardedAd();
     super.initState();
   }
 
@@ -67,10 +72,6 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _counter++;
     });
-
-    if (_counter % 2 == 0) {
-      _loadRewardedAd();
-    }
 
     if (_isRewardedAdReady && _counter % 3 == 0) {
       showDialog(
@@ -93,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   _rewardedAd.show(
                     onUserEarnedReward: (RewardedAd ad, RewardItem reward) {
                       debugPrint("reward earned !!");
-                      // _loadRewardedAd();
+                      _loadRewardedAd();
                     },
                   );
                 },
