@@ -13,42 +13,41 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  BannerAd? _standardBanner;
+  late NativeAd _nativeAd;
+  bool _isAdLoaded = false;
   int _counter = 0;
 
-  _createStandardBanner() {
-    final BannerAd myBanner = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      size: AdSize.banner,
+  _createNativeAD() {
+    _nativeAd = NativeAd(
+      adUnitId: AdHelper.nativeAdUnitId,
+      factoryId: 'listTile',
       request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          debugPrint('Ad loaded.');
+      listener: NativeAdListener(
+        onAdLoaded: (ad) {
           setState(() {
-            _standardBanner = ad as BannerAd?;
+            debugPrint("setState is being called...");
+            _isAdLoaded = true;
           });
         },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+        onAdFailedToLoad: (ad, error) {
           ad.dispose();
-          debugPrint('Ad failed to load: $error');
+          debugPrint(
+              'Ad load failed (code=${error.code} message=${error.message})');
         },
-        onAdOpened: (Ad ad) => debugPrint('Ad opened.'),
-        onAdClosed: (Ad ad) => debugPrint('Ad closed.'),
-        onAdImpression: (Ad ad) => debugPrint('Ad impression.'),
       ),
     );
-    myBanner.load();
+    _nativeAd.load();
   }
 
   @override
   void initState() {
-    _createStandardBanner();
     super.initState();
+    _createNativeAD();
   }
 
   @override
   void dispose() {
-    _standardBanner?.dispose();
+    _nativeAd.dispose();
     super.dispose();
   }
 
@@ -60,7 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    _createStandardBanner();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -69,13 +67,18 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            if (_standardBanner != null)
-              Container(
-                color: Colors.green,
-                width: _standardBanner!.size.width.toDouble(),
-                height: _standardBanner!.size.height.toDouble(),
-                child: AdWidget(ad: _standardBanner!),
-              ),
+            _isAdLoaded
+                ? Container(
+                    height: 100.0,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    child: AdWidget(ad: _nativeAd),
+                  )
+                : Container(
+                    height: 100.0,
+                    width: double.infinity,
+                    color: Colors.green,
+                  ),
             const Text(
               'You have pushed the button this many times:',
             ),
