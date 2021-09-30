@@ -23,17 +23,20 @@ class _MyHomePageState extends State<MyHomePage> {
       factoryId: 'listTile',
       request: const AdRequest(),
       listener: NativeAdListener(
-        onAdLoaded: (ad) {
+        onAdLoaded: (Ad ad) {
           setState(() {
-            debugPrint("setState is being called...");
             _nativeAd = ad as NativeAd;
           });
+          debugPrint('Ad loaded.');
         },
-        onAdFailedToLoad: (ad, error) {
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
           ad.dispose();
-          debugPrint(
-              'Ad load failed (code=${error.code} message=${error.message})');
+          debugPrint('Ad failed to load: $error');
         },
+        onAdOpened: (Ad ad) => debugPrint('Ad opened.'),
+        onAdImpression: (Ad ad) => debugPrint('Ad impression.'),
+        onNativeAdClicked: (NativeAd ad) => debugPrint('Ad clicked.'),
+        onAdClosed: (Ad ad) => debugPrint('Ad closed.'),
       ),
     );
     _ad.load();
