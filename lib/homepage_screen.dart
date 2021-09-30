@@ -23,7 +23,7 @@ class _MyHomePageState extends State<MyHomePage> {
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) {
-          debugPrint('Ad loaded.');
+          debugPrint('Ad loaded...');
           setState(() {
             _standardBanner = ad as BannerAd?;
           });
