@@ -42,8 +42,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    _createStandardBanner();
     super.initState();
+    _createStandardBanner();
   }
 
   @override
@@ -60,7 +60,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    _createStandardBanner();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
