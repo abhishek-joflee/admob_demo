@@ -44,8 +44,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    _loadInterstitialAd();
     super.initState();
+    _loadInterstitialAd();
   }
 
   @override
